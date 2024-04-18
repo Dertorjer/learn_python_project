@@ -1,6 +1,5 @@
 import argparse
 
-
 # Клас для книги
 class BookModel:
     def __init__(self, title: str, author: str, year: int, genre: str):
