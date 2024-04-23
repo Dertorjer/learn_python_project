@@ -1,3 +1,5 @@
+import argparse
+
 # Клас для книги
 class BookModel:
     def __init__(self, title: str, author: str, year: int, genre: str):
@@ -7,78 +9,85 @@ class BookModel:
         self.genre = genre
 
 # Клас для журналу
-class MagazineModel:
-    def __init__(self, title: str, author: str, year: int, volume: int):
+class JournalModel:
+    def __init__(self, title: str, author: str, date: str, type: str):
         self.title = title
         self.author = author
-        self.year = year
-        self.volume = volume
+        self.date = date
+        self.type = type
 
-# Клас для бібліотеки книг
+# Клас для бібліотеки книг та журналів
 class Library:
     def __init__(self):
-        self.books = []
+        self.items = []
 
-    # Метод додавання книги
-    def add_book(self, book):
-        self.books.append(book)
-        print(f"До бібліотеки додано книгу: {book.title}")
+    # Метод додавання книги або журналу
+    def add_item(self, item):
+        self.items.append(item)
+        if isinstance(item, BookModel):
+            print(f"До бібліотеки додано книгу: {item.title}")
+        elif isinstance(item, JournalModel):
+            print(f"До бібліотеки додано журнал: {item.title}")
 
-    # Метод видалення книги
-    def remove_book(self, title: str):
-        for book in self.books:
-            if book.title == title:
-                self.books.remove(book)
-                print(f"З бібліотеки видалено книгу: {title}")
+    # Метод видалення книги або журналу
+    def remove_item(self, title: str):
+        for item in self.items:
+            if item.title == title:
+                self.items.remove(item)
+                print(f"З бібліотеки видалено елемент: {title}")
                 return
-        print(f"Книга '{title}' відсутня в бібліотеці")
+        print(f"Елемент '{title}' відсутній в бібліотеці")
 
-    # Метод для виведення списку книг
-    def list_books(self):
-        if not self.books:
-            print("У бібліотеці немає жодної книги")
+    # Метод для виведення списку книг та журналів
+    def list_items(self):
+        if not self.items:
+            print("У бібліотеці немає жодних книг або журналів")
         else:
-            print("Список книг у бібліотеці:")
-            for book in self.books:
-                if isinstance(book, BookModel):
-                    print(f"Книга: {book.title}, Автор: {book.author}, Рік: {book.year}, Жанр: {book.genre}")
-                elif isinstance(book, MagazineModel):
-                    print(f"Журнал: {book.title}, Автор: {book.author}, Рік: {book.year}, Том: {book.volume}")
+            print("Список книг та журналів у бібліотеці:")
+            for item in self.items:
+                if isinstance(item, BookModel):
+                    print(f"Книга: Назва: {item.title}, Автор: {item.author}, Рік: {item.year}, Жанр: {item.genre}")
+                elif isinstance(item, JournalModel):
+                    print(f"Журнал: Назва: {item.title}, Автор: {item.author}, Дата: {item.date}, Тип: {item.type}")
 
-    # Метод для збереження книг у файл
-    def save_books_to_file(self, filename):
+    # Метод для збереження списку книг та журналів у файл
+    def save_items_to_file(self, filename):
         with open(filename, 'w') as file:
-            for book in self.books:
-                if isinstance(book, BookModel):
-                    file.write(f"Book,{book.title},{book.author},{book.year},{book.genre}\n")
-                elif isinstance(book, MagazineModel):
-                    file.write(f"Magazine,{book.title},{book.author},{book.year},{book.volume}\n")
+            for item in self.items:
+                if isinstance(item, BookModel):
+                    file.write(f"Book,{item.title},{item.author},{item.year},{item.genre}\n")
+                elif isinstance(item, JournalModel):
+                    file.write(f"Journal,{item.title},{item.author},{item.date},{item.type}\n")
 
-    # Метод для завантаження книг з файлу
-    def load_books_from_file(self, filename):
+    # Метод для завантаження списку книг та журналів з файлу
+    def load_items_from_file(self, filename):
         with open(filename, 'r') as file:
             for line in file:
-                data = line.strip().split(',')
-                if data[0] == 'Book':
-                    book = BookModel(data[1], data[2], int(data[3]), data[4])
-                    self.add_book(book)
-                elif data[0] == 'Magazine':
-                    magazine = MagazineModel(data[1], data[2], int(data[3]), int(data[4]))
-                    self.add_book(magazine)
+                type, *data = line.strip().split(',')
+                if type == 'Book':
+                    title, author, year, genre = data
+                    book = BookModel(title, author, int(year), genre)
+                    self.add_item(book)
+                elif type == 'Journal':
+                    title, author, date, type = data
+                    journal = JournalModel(title, author, date, type)
+                    self.add_item(journal)
+
 
 def main():
     library = Library()
 
     while True:
-        print("\nВиберіть опцію:")
+        print("\nМеню:")
         print("1. Додати книгу")
-        print("2. Видалити книгу")
-        print("3. Вивести список книг")
-        print("4. Зберегти дані у файл")
-        print("5. Завантажити дані з файлу")
-        print("6. Вихід")
+        print("2. Додати журнал")
+        print("3. Видалити елемент")
+        print("4. Вивести список книг та журналів у бібліотеці")
+        print("5. Зберегти список книг та журналів у файл")
+        print("6. Завантажити список книг та журналів з файлу")
+        print("7. Вийти з програми")
 
-        choice = input("Введіть номер опції: ")
+        choice = input("Оберіть операцію: ")
 
         if choice == '1':
             title = input("Введіть назву книги: ")
@@ -86,24 +95,30 @@ def main():
             year = int(input("Введіть рік видання книги: "))
             genre = input("Введіть жанр книги: ")
             book = BookModel(title, author, year, genre)
-            library.add_book(book)
+            library.add_item(book)
         elif choice == '2':
-            title = input("Введіть назву книги, яку бажаєте видалити: ")
-            library.remove_book(title)
+            title = input("Введіть назву журналу: ")
+            author = input("Введіть автора журналу: ")
+            date = input("Введіть дату видання журналу: ")
+            type = input("Введіть тип журналу (ранковий, вечірній, тижневий): ")
+            journal = JournalModel(title, author, date, type)
+            library.add_item(journal)
         elif choice == '3':
-            library.list_books()
+            title = input("Введіть назву елемента для видалення: ")
+            library.remove_item(title)
         elif choice == '4':
-            filename = input("Введіть назву файлу для збереження: ")
-            library.save_books_to_file(filename)
-            print("Дані збережено у файл")
+            library.list_items()
         elif choice == '5':
-            filename = input("Введіть назву файлу для завантаження: ")
-            library.load_books_from_file(filename)
-            print("Дані завантажено з файлу")
+            filename = input("Введіть назву файлу для збереження книг та журналів: ")
+            library.save_items_to_file(filename)
         elif choice == '6':
+            filename = input("Введіть назву файлу для завантаження книг та журналів: ")
+            library.load_items_from_file(filename)
+        elif choice == '7':
+            print("Програма завершена.")
             break
         else:
-            print("Неправильний вибір. Спробуйте ще раз.")
+            print("Некоректний вибір. Спробуйте ще раз.")
 
 if __name__ == "__main__":
     main()
